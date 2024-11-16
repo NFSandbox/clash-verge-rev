@@ -105,6 +105,18 @@ interface ILogItem {
   type: string;
   time?: string;
   payload: string;
+  detail?: ILogItemDetail;
+}
+
+//[TCP] 10.96.0.0:6192(node.exe) --> github.com:443 match DomainKeyword(github) using Hongkong1
+interface ILogItemDetail {
+  connType: string; // E.g.: TCP
+  source: string;
+  target: string;
+  processName?: string;
+  match: string; // E.g.: DomainSuffix
+  matchDetail?: string; // E.g.: google.com
+  using: string;
 }
 
 interface IConnectionsItem {
