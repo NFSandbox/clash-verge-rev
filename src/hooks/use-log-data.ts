@@ -7,6 +7,36 @@ import { create } from "zustand";
 
 const MAX_LOG_NUM = 1000;
 
+/**
+ * Try parse and extract more detailed info from log string returned by clash core.
+ *
+ * @param logStr The string need to be parsed.
+ * @returns `ILogItemDetail` object if parsed success, else `undefined`
+ */
+function parseLogDataString(logStr: string): ILogItemDetail | undefined {
+  try {
+    const regex =
+      /\[(?<connType>[^\]]+?)\]\s+(?<source>[^\s]+?)(?:\((?<processName>[^\)]+?)\))?\s*?-->\s*?(?<target>[^\s]+?)\s+?match\s+?(?<match>[^\s]+?)(?:\((?<matchDetail>[^\)]+?)\))?\s+?using\s+?(?<using>.+?)$/;
+    const match = logStr.match(regex);
+
+    if (!match || !match.groups) {
+      return undefined; // If the log string doesn't match the pattern
+    }
+
+    return {
+      connType: match.groups.connType,
+      source: match.groups.source,
+      target: match.groups.target,
+      processName: match.groups.processName, // Optional, could be undefined
+      match: match.groups.match,
+      matchDetail: match.groups.matchDetail, // Optional, could be undefined
+      using: match.groups.using,
+    };
+  } catch (e) {
+    return undefined;
+  }
+}
+
 export type LogLevel = "warning" | "info" | "debug" | "error" | "all";
 
 interface ILogItem {
@@ -62,7 +92,7 @@ const useLogStore = create<LogStore>(
             : [...currentLogs, log];
         return { logs: { ...state.logs, [level]: newLogs } };
       }),
-  }),
+  })
 );
 
 export const useLogData = (logLevel: LogLevel) => {
@@ -82,7 +112,14 @@ export const useLogData = (logLevel: LogLevel) => {
         if (!isActive) return;
         const data = JSON.parse(event.data) as ILogItem;
         const time = dayjs().format("MM-DD HH:mm:ss");
-        appendLog(logLevel, { ...data, time });
+
+        // try use regex to extract more detailed log info
+        const detailedData: ILogItem = {
+          ...data,
+          detail: parseLogDataString(data.payload),
+        };
+
+        appendLog(logLevel, { ...detailedData, time });
       },
       onerror() {
         if (!isActive) return;
