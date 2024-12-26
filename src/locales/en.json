@@ -395,5 +395,6 @@
   "Confirm to delete this backup file?": "Confirm to delete this backup file?",
   "Confirm to restore this backup file?": "Confirm to restore this backup file?",
   "Restore Success, App will restart in 1s": "Restore Success, App will restart in 1s",
-  "Failed to fetch backup files": "Failed to fetch backup files"
+  "Failed to fetch backup files": "Failed to fetch backup files",
+  "Better Log Visualization": "Better Log Visualization"
 }

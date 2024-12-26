@@ -127,6 +127,20 @@ export const LayoutViewer = forwardRef<DialogRef>((props, ref) => {
         </Item>
 
         <Item>
+          <ListItemText primary={t("Better Log Visualization")} />
+          <GuardState
+            value={verge?.better_log_visualization ?? true}
+            valueProps="checked"
+            onCatch={onError}
+            onFormat={onSwitchFormat}
+            onChange={(e) => onChangeData({ better_log_visualization: e })}
+            onGuard={(e) => patchVerge({ better_log_visualization: e })}
+          >
+            <Switch edge="end" />
+          </GuardState>
+        </Item>
+
+        <Item>
           <ListItemText primary={t("Nav Icon")} />
           <GuardState
             value={verge?.menu_icon ?? "monochrome"}

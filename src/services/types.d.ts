@@ -713,6 +713,7 @@ interface IVergeConfig {
   traffic_graph?: boolean;
   enable_memory_usage?: boolean;
   enable_group_icon?: boolean;
+  better_log_visualization?: boolean;
   menu_icon?: "monochrome" | "colorful" | "disable";
   tray_icon?: "monochrome" | "colorful";
   common_tray_icon?: boolean;

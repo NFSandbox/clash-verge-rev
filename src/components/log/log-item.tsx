@@ -1,7 +1,8 @@
+import React, { CSSProperties } from "react";
 import { styled, Box, Tooltip } from "@mui/material";
 import { SearchState } from "@/components/base/base-search-box";
 import ChevronRightRoundedIcon from "@mui/icons-material/ChevronRightRounded";
-import React, { CSSProperties } from "react";
+import { useVerge } from "@/hooks/use-verge";
 
 const Item = styled(Box)(({ theme: { palette, typography } }) => ({
   padding: "8px 0",
@@ -71,11 +72,27 @@ function SourceBlock(props: SourceBlockProps) {
 
 interface TargetBlockProps {
   target: React.ReactNode;
+  targetUrl: string;
 }
 
 function TargetBlock(props: TargetBlockProps) {
-  const { target } = props;
+  const { target, targetUrl } = props;
 
+  /**
+   * Parent component directly passed in a React.ReactNode type,
+   * so we do not perform any URL styling anymore, and instead
+   * directly return this ReactNode object.
+   */
+  if (typeof target !== "string") {
+    return <p>{target}</p>;
+  }
+
+  /**
+   * Extract subdomain, topdomain and port info from a valid URL string.
+   *
+   * @param input A valid URL string.
+   * @returns Object contains detailed info of this URL.
+   */
   function parseUrl(input: string) {
     // Add a dummy protocol if missing
     const urlString =
@@ -121,7 +138,7 @@ function TargetBlock(props: TargetBlockProps) {
     }
   }
 
-  const targetInfo = parseUrl(target);
+  const targetInfo = parseUrl(targetUrl);
 
   return (
     <Tooltip title={target}>
@@ -203,6 +220,9 @@ interface Props {
 }
 
 const LogItem = ({ value, searchState }: Props) => {
+  const { verge } = useVerge();
+  const enableBetterLogVisualization = verge?.better_log_visualization ?? true;
+
   /**
    *
    * @param text Original text that need to be highlighted
@@ -246,7 +266,7 @@ const LogItem = ({ value, searchState }: Props) => {
   const detail = value.detail;
 
   // If there is detailed info in value, use detailed layout
-  if (detail !== undefined) {
+  if (detail !== undefined && enableBetterLogVisualization) {
     return (
       <Item>
         <div>
@@ -317,7 +337,10 @@ const LogItem = ({ value, searchState }: Props) => {
             ></ChevronRightRoundedIcon>
 
             {/* Target */}
-            <TargetBlock target={renderHighlightText(detail.target)} />
+            <TargetBlock
+              target={renderHighlightText(detail.target)}
+              targetUrl={detail.target}
+            />
           </Box>
 
           {/* Match  */}
